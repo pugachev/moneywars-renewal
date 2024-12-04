@@ -1,0 +1,9 @@
+
+.DS_Store
+.DS_Store
+.DS_Store
+node_modules/@esbuild/darwin-x64/package.json
+node_modules/@esbuild/darwin-x64/README.md
+node_modules/@esbuild/darwin-x64/bin/esbuild
+node_modules
+/vendors/
