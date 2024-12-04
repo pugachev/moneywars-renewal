@@ -17,6 +17,8 @@ session_cache_limiter('none');
       $store_data .= "<option value='". $val->store_num;
       $store_data .= "'>". $val->store_name. "</option>";
   }
+
+  $actualresults=120000;
 ?>
 <!doctype html>
 <html lang="ja">
@@ -48,48 +50,61 @@ session_cache_limiter('none');
     <div id="alert" class="alert alert-success">{{session('message')}}</div>
     @endif
 
-    <div class="row">
-        <div class="container d-flex justify-content-between my-3" style="text-align:center;">
-          <div class="justify-content-center">
-            <form method="post" action="{{route('money.preweek')}}" class="form-inline" enctype="multipart/form-data" autocomplete="off">
-              @csrf
-              <button id="preweek" type="submit" class="btn btn-outline-danger btn-lg">前週</button>
-              <input type="hidden" value='<?php echo $firstDate; ?>' name="preweek">
-            </form>
+    <div class="row form-container my-3">
+      <div class="container d-flex justify-content-between align-items-center my-1">
+          <!-- 左端の「前週」ボタン -->
+          <div>
+              <a href="{{route('money.preweek')}}?preweek=<?php echo $firstDate; ?>" 
+                class="btn btn-outline-danger btn-lg" 
+                style="padding: 20px 40px; font-size: 1.5rem;">
+                  前週
+              </a>
           </div>
-          <div class="justify-content-center">
-            <label class="col-form-label">月間目標値</label>
-            <label class="col-form-label"><mark><strong>100,000</strong></mark></label>
-          </div>
-          <div class="justify-content-center">
-            <label class="col-form-label"><?php echo date('m'); ?>月合計</label>
-            <label class="col-form-label"><mark><strong><?php echo number_format($actualresults) ?></strong></mark></label>
-          </div>
-          <div class="justify-content-center">
-            <form method="post" action="{{route('money.nextweek')}}" class="form-inline" enctype="multipart/form-data" autocomplete="off">
-              @csrf
-              <button id="nextweek" type="submit" class="btn btn-outline-danger btn-lg">次週</button>
-              <input type="hidden" value='<?php echo $firstDate; ?>' name="nextweek">
-            </form>
-          </div>
-        </div>
 
-        <div class="container d-flex justify-content-center my-1" style="text-align:center;">
+          <!-- 中央の目標値と合計を横並びに -->
+          <div class="d-flex justify-content-center align-items-center">
+              <div class="text-center mx-3">
+                  <label class="col-form-label" style="font-size: 1.5rem;">月間目標値</label>
+                  <label class="col-form-label" style="font-size: 1.5rem;">
+                      <mark><strong>100,000</strong></mark>
+                  </label>
+              </div>
+              <div class="text-center mx-3">
+                  <label class="col-form-label" style="font-size: 1.5rem;"><?php echo date('m'); ?>月合計</label>
+                  <label class="col-form-label" style="font-size: 1.5rem;">
+                      <mark><strong><?php echo number_format($actualresults) ?></strong></mark>
+                  </label>
+              </div>
+          </div>
+
+          <!-- 右端の「次週」ボタン -->
+          <div>
+              <a href="{{route('money.nextweek')}}?nextweek=<?php echo $firstDate; ?>" 
+                class="btn btn-outline-danger btn-lg" 
+                style="padding: 20px 40px; font-size: 1.5rem;">
+                  次週
+              </a>
+          </div>
+      </div>
+
+      <!-- 下部のエラーメッセージ -->
+      <div class="container d-flex justify-content-center my-0 text-center flex-wrap">
           <?php if(isset($actualresults) && intval($actualresults) > intval(80000)) :?>
-            <div class="justify-content-center mr-5">
-              <label class="col-form-label"><strong style="color:red;font-size:20px;">予算 OVER</strong></label>
-            </div>
+              <div class="mx-3">
+                  <label class="col-form-label"><strong style="color:red;font-size:20px;">予算 OVER</strong></label>
+              </div>
           <?php endif; ?>
           <?php if(isset($amazoncount) && intval($amazoncount) > intval(50000)) :?>
-            <div class="justify-content-center mr-5">
-              <label class="col-form-label"><strong style="color:red;font-size:20px;">Amazon OVER</strong></label>
-            </div>
+              <div class="mx-3">
+                  <label class="col-form-label"><strong style="color:red;font-size:20px;">Amazon OVER</strong></label>
+              </div>
           <?php endif; ?>
-        </div>
+      </div>
+  </div>
+
+    <div id="wrap">
+        <div id="mini-calendar"></div>
     </div>
-    <!-- <div class="container my-1">
-      <div id="mini-calendar"></div>
-    </div> -->
     <!-- ここに本文を記述します -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="/js/jquery.minicalendar.js"></script>
@@ -98,10 +113,18 @@ session_cache_limiter('none');
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <style>
+      .form-container {
+        display: flex;
+        flex-direction: column; /* 縦方向に並べる */
+        gap: 5px; /* フォーム間の余白を設定 */
+      }
+    </style>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ja.min.js"></script>
     <script type="text/javascript">
       tgt_dates = <?php echo $tgt_dates; ?>;
+
       $(function(){
         setTimeout(function () {
             //保存後に画面がリダイレクトされることを利用している
@@ -126,9 +149,8 @@ session_cache_limiter('none');
         $('#mini-calendar').miniCalendar();
 
       });
-
-
     </script>
+    <stylesheet
   </body>
 </html>
 <div class="modal fade" id="dataCreate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
