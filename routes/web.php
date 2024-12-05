@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect('/money');
 });
+// Route::get('/', [MoneyController::class, 'index'])->name('money.index');
 Route::get('money', [MoneyController::class, 'index'])->name('money.index');
 Route::get('money/create', [MoneyController::class, 'create'])->name('money.create');
 Route::post('money', [MoneyController::class, 'store'])->name('money.store');

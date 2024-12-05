@@ -30,84 +30,34 @@ session_cache_limiter('none');
     <title>MoneyWars</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-danger sticky-top mb-0" >
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger sticky-top mb-0">
         <a class="navbar-brand" href="{{route('money.index')}}">MoneyWars</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse justify-start" id="navbarSupportedContent">
-          <ul class="navbar-nav">
-            <li class="nav-item active">
-              <a class="nav-link" href="{{route('money.index')}}">集計グラフ</a>
-            </li>
-            <li class="nav-item active">
-              <a class="nav-link" href="#" data-toggle="modal" data-target="#dataCreate">新規作成</a>
-            </li>
-          </ul>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <!-- 左側のナビゲーション -->
+            <ul class="navbar-nav d-flex align-items-center">
+                <li class="nav-item active d-flex align-items-center">
+                    <span><a class="nav-link" href="#" data-toggle="modal" data-target="#dataCreate" style="color: #ffffff;font-weight: bold;">新規</a></span>
+                    <!-- 月間目標値を新規作成の隣に配置 -->
+                    <span class="ml-3 navbar-text" style="color: #ffffff;font-weight: bold;">月間目標 : 100000円</span>
+                    <!-- 月間実測値を月間目標値の隣に配置 -->
+                    <span class="ml-3 navbar-text" style="color: #ffffff;font-weight: bold;">月間実測 : <mark><strong><?php echo number_format($actualresults) ?></strong></mark>円</span>
+                </li>
+            </ul>
         </div>
     </nav>
     @if(session('message'))
     <div id="alert" class="alert alert-success">{{session('message')}}</div>
     @endif
 
-    <div class="row form-container my-3">
-      <div class="container d-flex justify-content-between align-items-center my-1">
-          <!-- 左端の「前週」ボタン -->
-          <div>
-              <a href="{{route('money.preweek')}}?preweek=<?php echo $firstDate; ?>" 
-                class="btn btn-outline-danger btn-lg" 
-                style="padding: 20px 40px; font-size: 1.5rem;">
-                  前週
-              </a>
-          </div>
-
-          <!-- 中央の目標値と合計を横並びに -->
-          <div class="d-flex justify-content-center align-items-center">
-              <div class="text-center mx-3">
-                  <label class="col-form-label" style="font-size: 1.5rem;">月間目標値</label>
-                  <label class="col-form-label" style="font-size: 1.5rem;">
-                      <mark><strong>100,000</strong></mark>
-                  </label>
-              </div>
-              <div class="text-center mx-3">
-                  <label class="col-form-label" style="font-size: 1.5rem;"><?php echo date('m'); ?>月合計</label>
-                  <label class="col-form-label" style="font-size: 1.5rem;">
-                      <mark><strong><?php echo number_format($actualresults) ?></strong></mark>
-                  </label>
-              </div>
-          </div>
-
-          <!-- 右端の「次週」ボタン -->
-          <div>
-              <a href="{{route('money.nextweek')}}?nextweek=<?php echo $firstDate; ?>" 
-                class="btn btn-outline-danger btn-lg" 
-                style="padding: 20px 40px; font-size: 1.5rem;">
-                  次週
-              </a>
-          </div>
-      </div>
-
-      <!-- 下部のエラーメッセージ -->
-      <div class="container d-flex justify-content-center my-0 text-center flex-wrap">
-          <?php if(isset($actualresults) && intval($actualresults) > intval(80000)) :?>
-              <div class="mx-3">
-                  <label class="col-form-label"><strong style="color:red;font-size:20px;">予算 OVER</strong></label>
-              </div>
-          <?php endif; ?>
-          <?php if(isset($amazoncount) && intval($amazoncount) > intval(50000)) :?>
-              <div class="mx-3">
-                  <label class="col-form-label"><strong style="color:red;font-size:20px;">Amazon OVER</strong></label>
-              </div>
-          <?php endif; ?>
-      </div>
-  </div>
-
-    <div id="wrap">
+    <div id="wrap" class="mt-5 mb-5">
         <div id="mini-calendar"></div>
     </div>
     <!-- ここに本文を記述します -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="/js/jquery.minicalendar.js"></script>
+    <script src="{{ asset('js/jquery.minicalendar.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
