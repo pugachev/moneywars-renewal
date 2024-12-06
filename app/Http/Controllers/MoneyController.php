@@ -14,6 +14,7 @@ class MoneyController extends Controller
      */
     public function index()
     {
+
         $tgt_date = array();
         $tgt_sumvalue = array();
         
@@ -80,6 +81,49 @@ class MoneyController extends Controller
         // dd($amazoncount[0]['amazoncnt']);
         $amazoncount = $amazoncount[0]['amazoncnt'];
         return view('money.index',compact('tgt_date','tgt_sumvalue','categories','storetypes','actualresults','amazoncount'));
+
+    }
+
+
+    public function getJsonData(){
+        $data = [
+            'year' => 2024,
+            'month' => 12,
+            'event' => [
+                ['day' => '1', 'title' => 'イベント1', 'type' => 'blue'],
+                ['day' => '2', 'title' => 'イベント2', 'type' => 'red'],
+                ['day' => '3', 'title' => 'イベント3', 'type' => 'green'],
+                ['day' => '3', 'title' => 'イベント4'],
+                ['day' => '5', 'title' => 'イベント5', 'type' => 'blue'],
+                ['day' => '5', 'title' => 'イベント6', 'type' => 'red'],
+                ['day' => '7', 'title' => 'イベント7'],
+                ['day' => '8', 'title' => 'イベント8', 'type' => 'blue'],
+                ['day' => '8', 'title' => 'イベント9'],
+                ['day' => '10', 'title' => 'イベント10'],
+                ['day' => '10', 'title' => 'イベント11'],
+                ['day' => '12', 'title' => 'イベント12', 'type' => 'green'],
+                ['day' => '14', 'title' => 'イベント13'],
+                ['day' => '14', 'title' => 'イベント14', 'type' => 'red'],
+                ['day' => '15', 'title' => 'イベント15', 'type' => 'blue'],
+                ['day' => '17', 'title' => 'イベント16'],
+                ['day' => '19', 'title' => 'イベント17', 'type' => 'blue'],
+                ['day' => '21', 'title' => 'イベント18'],
+                ['day' => '24', 'title' => 'イベント19', 'type' => 'red'],
+                ['day' => '24', 'title' => 'イベント20'],
+                ['day' => '26', 'title' => 'イベント21', 'type' => 'green'],
+                ['day' => '28', 'title' => 'イベント22', 'type' => 'blue'],
+                ['day' => '28', 'title' => 'イベント23'],
+                ['day' => '28', 'title' => 'イベント24', 'type' => 'green'],
+                ['day' => '29', 'title' => 'イベント25', 'type' => 'red'],
+                ['day' => '29', 'title' => 'イベント26'],
+            ],
+            'holiday' => ['3', '4', '5'],
+        ];
+
+        // dd($data);
+
+        // JSONデータを返却
+        return response()->json($data, 200, [], JSON_UNESCAPED_UNICODE);
     }
 
     /**

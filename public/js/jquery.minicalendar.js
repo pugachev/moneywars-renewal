@@ -149,17 +149,32 @@
      */
     loadData : function() {
       var self = this;
+      let csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+      $.ajaxSetup({
+          headers: {
+              'X-CSRF-TOKEN': csrfToken
+          }
+      });
+      const BASE_URL = $('meta[name="base-url"]').attr('content');
       $.ajax({
         type: "GET",
-        url: self.opts.jsonData,
+        // url: "http://localhost/moneywars-renewal/public/money/json",
+        url: BASE_URL + "/money/json",
         dataType: "json",
-        async: false,
+        async: true,
         success: function(data){
+          console.log(data);
           self.events = data.event;
           self.year = data.year;
           self.month = data.month;
-          self.date = new Date(data.date);
+          self.date = new Date(data.day);
           self.holiday = data.holiday;
+          self.printType(self.year, self.month); // データ取得後にカレンダーを更新
+          self.setEvent(); // データ取得後にイベントを設定
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log(textStatus);
         }
       });
     }
@@ -167,7 +182,7 @@
 
   $.wop.miniCalendar.defaults = {
     weekType : ["日", "月", "火", "水", "木", "金", "土"],
-    jsonData: 'event.json'
+    // jsonData: 'event.json'
   };
   $.fn.miniCalendar = function(option){
     option = option || {};

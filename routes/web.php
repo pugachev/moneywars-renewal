@@ -20,6 +20,7 @@ Route::get('/', function () {
 });
 // Route::get('/', [MoneyController::class, 'index'])->name('money.index');
 Route::get('money', [MoneyController::class, 'index'])->name('money.index');
+Route::get('money/json', [MoneyController::class, 'getJsonData'])->withoutMiddleware(['verifyCsrfToken'])->name('money.json');
 Route::get('money/create', [MoneyController::class, 'create'])->name('money.create');
 Route::post('money', [MoneyController::class, 'store'])->name('money.store');
 Route::get('money/{money}', [MoneyController::class, 'show'])->name('money.show');
