@@ -1,22 +1,22 @@
 <?php
 header("Cache-Control: private");
 session_cache_limiter('none');
-  $firstDate = $tgt_date[0];
-  $tgt_date = json_encode($tgt_date);
-  $tgt_dates = $tgt_date;
-  $tgt_sumvalue = json_encode($tgt_sumvalue);
-  $cate_data="";
-  //戻りがオブジェクト型
-  foreach($categories as $val){
-      $cate_data .= "<option value='". $val->cate_num;
-      $cate_data .= "'>". $val->cate_name. "</option>";
-  }
-  $store_data="";
-  //戻りがオブジェクト型
-  foreach($storetypes as $val){
-      $store_data .= "<option value='". $val->store_num;
-      $store_data .= "'>". $val->store_name. "</option>";
-  }
+  // $firstDate = $tgt_date[0];
+  // $tgt_date = json_encode($tgt_date);
+  // $tgt_dates = $tgt_date;
+  // $tgt_sumvalue = json_encode($tgt_sumvalue);
+  // $cate_data="";
+  // //戻りがオブジェクト型
+  // foreach($categories as $val){
+  //     $cate_data .= "<option value='". $val->cate_num;
+  //     $cate_data .= "'>". $val->cate_name. "</option>";
+  // }
+  // $store_data="";
+  // //戻りがオブジェクト型
+  // foreach($storetypes as $val){
+  //     $store_data .= "<option value='". $val->store_num;
+  //     $store_data .= "'>". $val->store_name. "</option>";
+  // }
 
   $actualresults=120000;
 ?>
@@ -26,6 +26,7 @@ session_cache_limiter('none');
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="base-url" content="{{ url('/') }}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
     <link rel="shortcut icon" href="{{ asset('/money.png') }}">
     <title>MoneyWars</title>
@@ -45,6 +46,8 @@ session_cache_limiter('none');
                     <span class="ml-3 navbar-text" style="color: #ffffff;font-weight: bold;">月間目標 : 100000円</span>
                     <!-- 月間実測値を月間目標値の隣に配置 -->
                     <span class="ml-3 navbar-text" style="color: #ffffff;font-weight: bold;">月間実測 : <mark><strong><?php echo number_format($actualresults) ?></strong></mark>円</span>
+                    <span class="ml-3 navbar-text" style="color: #000000;font-weight: bold;"><a id="prevMonth" class="btn btn-light btn-sm" style="color: black;">前月</a></sapn>
+                    <span class="ml-3 navbar-text" style="color: #000000;font-weight: bold;"><a id="nextMonthLink" class="btn btn-light btn-sm" style="color: black;">翌月</a></sapn>
                 </li>
             </ul>
         </div>
@@ -59,7 +62,7 @@ session_cache_limiter('none');
     <!-- ここに本文を記述します -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="{{ asset('js/jquery.minicalendar.js') }}"></script>
-    <meta name="base-url" content="{{ url('/') }}">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
@@ -75,9 +78,37 @@ session_cache_limiter('none');
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ja.min.js"></script>
     <script type="text/javascript">
-      tgt_dates = <?php echo $tgt_dates; ?>;
 
       $(function(){
+
+        // インスタンス生成
+        var calendarInstance =  $('#miniCalendar').miniCalendar({ api: true });
+
+        // 前月ボタンイベント
+        $('#prevMonth').click(function() {
+            const currentDate = new Date(calendarInstance.year, calendarInstance.month - 1, 1);
+            const prevMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
+            const formattedDate = `${prevMonthDate.getFullYear()}-${(prevMonthDate.getMonth() + 1).toString().padStart(2, '0')}-01`;
+
+            calendarInstance.loadData(formattedDate); // 前月データを取得
+        });
+
+
+        $('#nextMonth').click(function() {
+            var currentMonth = new Date(self.year, self.month - 1, 1);
+            var nextMonth = new Date(currentMonth.setMonth(currentMonth.getMonth() + 1));
+            self.loadData(`${nextMonth.getFullYear()}-${(nextMonth.getMonth() + 1).toString().padStart(2, '0')}-01`);
+        });
+        // const BASE_URL = $('meta[name="base-url"]').attr('content');
+
+
+        // const prevMonthDate = "{{ \Carbon\Carbon::now()->startOfMonth()->subMonth()->format('Y-m-d') }}";
+        // // document.getElementById('prevMonthLink').href = `${BASE_URL}/money/json?tgtdate=${prevMonthDate}`;
+        // document.getElementById('prevMonthLink').href = `${BASE_URL}/money/json?tgtdate=${prevMonthDate}`;
+
+        // const nextMonthDate = "{{ \Carbon\Carbon::now()->startOfMonth()->addMonth()->format('Y-m-d') }}";
+        // document.getElementById('nextMonthLink').href = `${BASE_URL}/money/json?tgtdate=${nextMonthDate}`;
+
         setTimeout(function () {
             //保存後に画面がリダイレクトされることを利用している
             $('#alert').fadeOut(3000);
@@ -105,53 +136,3 @@ session_cache_limiter('none');
     <stylesheet
   </body>
 </html>
-<div class="modal fade" id="dataCreate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">新規作成</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-          <form method="post" action="{{route('money.store')}}" class="form-inline" enctype="multipart/form-data" autocomplete="off">
-              @csrf
-              <div class="modal-body">
-                  <div class="row">
-                      <div class="form-group mb-1" style="width:100%;">
-                          <span class="col-3">日付</span>
-                          <input type="text" class="datepicker datepicker-dropdown" id="tgt_date" name="tgt_date">
-                      </div>
-                      <br />
-                      <div class="form-group mb-1" style="width:100%;">
-                          <span class="col-3">種類</span>
-                          <select name="tgt_item" id="tgt_item" class="browser-default custom-select">
-                              <?php echo $cate_data; ?>
-                          </select>
-                      </div>
-                      <div class="form-group mb-1" style="width:100%;">
-                          <span class="col-3">項目名</span>
-                          <input type="text" id="tgt_name" name="tgt_name" class="form-control">
-                      </div>
-                      <div class="form-group mb-1" style="width:100%;">
-                          <span class="col-3">店舗種別</span>
-                          <select name="tgt_storetype" id="tgt_storetype" class="browser-default custom-select">
-                              <?php echo $store_data; ?>
-                          </select>
-                      </div>
-                      <div class="form-group mb-1" style="width:100%;">
-                          <span class="col-3">支出額</span>
-                          <input type="text" id="tgt_payment" name="tgt_payment" class="form-control">
-                      </div>
-                  </div>
-                  <div class="modal-footer text-right">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-                    <button type="submit" class="btn btn-primary">保存</button>
-                  </div>
-              </div>
-          </form>
-      </div>
-    </div>
-  </div>
-</div>

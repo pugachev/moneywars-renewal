@@ -147,35 +147,37 @@
     /**
      * jsonファイルからデータを読み込む
      */
-    loadData : function() {
+    loadData : function(targetDate = null) {
       var self = this;
       let csrfToken = $('meta[name="csrf-token"]').attr('content');
-
+  
+      const defaultTgtDate = targetDate || `${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}-01`;
+  
       $.ajaxSetup({
           headers: {
               'X-CSRF-TOKEN': csrfToken
           }
       });
+  
       const BASE_URL = $('meta[name="base-url"]').attr('content');
       $.ajax({
-        type: "GET",
-        // url: "http://localhost/moneywars-renewal/public/money/json",
-        url: BASE_URL + "/money/json",
-        dataType: "json",
-        async: true,
-        success: function(data){
-          console.log(data);
-          self.events = data.event;
-          self.year = data.year;
-          self.month = data.month;
-          self.date = new Date(data.day);
-          self.holiday = data.holiday;
-          self.printType(self.year, self.month); // データ取得後にカレンダーを更新
-          self.setEvent(); // データ取得後にイベントを設定
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-          console.log(textStatus);
-        }
+          type: "GET",
+          url: `${BASE_URL}/money/json?tgtdate=${defaultTgtDate}`,
+          dataType: "json",
+          async: true,
+          success: function(data) {
+              console.log(data);
+              self.events = data.event;
+              self.year = data.year;
+              self.month = data.month;
+              self.date = new Date(data.year, data.month - 1, 1);
+              self.holiday = data.holiday;
+              self.printType(self.year, self.month);
+              self.setEvent();
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+              console.error("データ取得エラー:", textStatus);
+          }
       });
     }
   };
@@ -186,7 +188,7 @@
   };
   $.fn.miniCalendar = function(option){
     option = option || {};
-    var api = new $.wop.miniCalendar(this,option);
+    var api = new $.wop.miniCalendar(this, { targetDate: null });
     return option.api ? api : this;
   };
 })(jQuery);

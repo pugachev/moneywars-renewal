@@ -6,89 +6,34 @@ use App\Models\Spending;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
+use Carbon\Carbon;
 class MoneyController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
 
-        $tgt_date = array();
-        $tgt_sumvalue = array();
-        
-        //spendingsテーブルから当月・一週間分(日曜日開始)のデータを取得
-        //今日日付の曜日番号取得
-        $w = date("w",strtotime(date('Y-m-d')));
-        //今週最初日付の取得
-        $start_day = date('Y-m-d', strtotime("-{$w} day", strtotime(date('Y-m-d'))));
-        //今週最後の日付取得
-        $w = 6- $w;
-        $end_day = date('Y-m-d', strtotime("+{$w} day", strtotime(date('Y-m-d'))));
 
-        if(is_array($tgt_date) && empty($tgt_date)){
-            $targetDate = $start_day;
-            for($i=0;$i<7;$i++){
-                array_push($tgt_date,date("Y-m-d",strtotime("+{$i} day",strtotime($targetDate))));
-            }
-        }
+        // 初期データ（必要に応じて変更可能）
+        $tgtdate = $request->query('tgtdate', Carbon::now()->format('Y-m-d'));
 
-        //指定週間のデータ取得
-        $results=Spending::groupBy('tgt_date')
-        ->select('tgt_date',DB::raw('sum(tgt_payment) as sumvalue'))
-        ->whereBetween('tgt_date',[$start_day,$end_day])
-        ->get();
-
-        foreach ($results as $result) {
-            array_push($tgt_sumvalue,$result['sumvalue']);
-        }
-
-        // dd($tgt_sumvalue);
-
-        //指定月間の合計値の取得
-        $tmpactualresults=Spending::select(DB::raw('sum(tgt_payment) as sumvalue'))
-        ->where('tgt_date','like','%'.date('Y-m').'%')
-        ->get();
-
-        foreach($tmpactualresults as $val){
-            $actualresults = $val['sumvalue'];
-        }
-
-        //データ不足箇所を0詰め
-        for($i=count($tgt_sumvalue);$i<7;$i++){
-            array_push($tgt_sumvalue,0);
-        }
-
-        //カテゴリ一覧
-        $categories = DB::table('categories')
-        ->select('cate_num','cate_name')
-        ->orderBy('cate_num','asc')
-        ->get();
-        //店舗種類一覧
-        $storetypes = DB::table('storetypes')
-        ->select('store_num','store_name')
-        ->orderBy('store_num','asc')
-        ->get();
-        //Amazon使用回数
-        $first_date = date("Y-m-01");
-        $last_date = date("Y-m-t");
-        $amazoncount=Spending::select(DB::raw('sum(tgt_payment) as amazoncnt'))
-        ->where('tgt_storetype','=',11)
-        ->whereBetween('tgt_date',[$first_date,$last_date])
-        ->get();
-        // dd($amazoncount->toSql(),$amazoncount->getBindings());
-        // dd($amazoncount[0]['amazoncnt']);
-        $amazoncount = $amazoncount[0]['amazoncnt'];
-        return view('money.index',compact('tgt_date','tgt_sumvalue','categories','storetypes','actualresults','amazoncount'));
+        return view('money.index', compact('tgtdate'));
 
     }
 
 
-    public function getJsonData(){
+    public function getJsonData(Request $request){
+
+        // $tgtdate = $tgtdate ?? Carbon::now()->format('Y-m-d');
+        $tgtdate = $request->input('tgtdate', Carbon::now()->format('Y-m-d'));
+        // Log::info('getJsonData(1) '.$year.'-'.$month);
+        $year = Carbon::parse($tgtdate)->year;
+        $month = Carbon::parse($tgtdate)->month;
         $data = [
-            'year' => 2024,
-            'month' => 12,
+            'year' => $year,
+            'month' => $month,
             'event' => [
                 ['day' => '1', 'title' => 'イベント1', 'type' => 'blue'],
                 ['day' => '2', 'title' => 'イベント2', 'type' => 'red'],
@@ -119,9 +64,7 @@ class MoneyController extends Controller
             ],
             'holiday' => ['3', '4', '5'],
         ];
-
-        // dd($data);
-
+        Log::info('getJsonData(2) '.$year.'-'.$month);
         // JSONデータを返却
         return response()->json($data, 200, [], JSON_UNESCAPED_UNICODE);
     }
