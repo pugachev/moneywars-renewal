@@ -62,10 +62,11 @@
      * 日付・曜日の配置
      */
     printType : function(thisYear, thisMonth) {
-
-      $(this.ele).find('.calendar-year-month').text(thisYear + '年' + thisMonth　+ '月');
+      let tgtyearmonth = thisYear + '年' + thisMonth+ '月';
+      $(this.ele).find('.calendar-year-month').text(tgtyearmonth);
       var thisDate = new Date(thisYear, thisMonth-1, 1);
-
+      console.log($('.calendar-year-month').text());
+      
       // 開始の曜日
       var startWeek = thisDate.getDay();
 

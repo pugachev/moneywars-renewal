@@ -89,7 +89,8 @@ session_cache_limiter('none');
             const currentDate = new Date(calendarInstance.year, calendarInstance.month - 1, 1);
             const prevMonthDate = new Date(currentDate.setMonth(currentDate.getMonth() - 1));
             const formattedDate = `${prevMonthDate.getFullYear()}-${(prevMonthDate.getMonth() + 1).toString().padStart(2, '0')}-01`;
-
+            const dispDate = `${prevMonthDate.getFullYear()}年${(prevMonthDate.getMonth() + 1).toString().padStart(2, '0')}月`;
+            $('.calendar-year-month').text(dispDate);
             calendarInstance.loadData(formattedDate); // 前月データを取得
         });
 
